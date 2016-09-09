@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.diroag.floatingwindows.view.FloatableLayout;
+
 
 public class FloatingWindowService extends Service implements IFloatingWindowService {
 
@@ -22,7 +24,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
     private transient boolean mIsWindowShown;
     private WindowManager windowManager;
 
-    private View mRootView;
+    private FloatableLayout mRootView;
 
     private WindowManager.LayoutParams mParams;
 
@@ -57,17 +59,22 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
 
     /**
      * Muestra el campo en ventana flotante
-     *
      */
     @Override
     public void show(AbstractFloatingWindowView view) {
-        if(view==null)
+        if (view == null)
             throw new IllegalArgumentException("view cannot be null dude");
         if (!mIsWindowShown) {
-            mRootView = view.getRootView();
+            mRootView = view.getWrappedRootView();
             view.bindToService(this);
             setTouchListener();
             reMeasureRootView();
+            mRootView.setOnBackListener(new FloatableLayout.OnBackListener() {
+                @Override
+                public void onBackPressed() {
+                    hide(false);
+                }
+            });
             windowManager.addView(mRootView, mParams);
             mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
@@ -78,8 +85,8 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
                     if (left == 0 && top == 0 && right == 0 && bottom == 0) {
                         return;
                     }
-                    reMeasureRootView();
-                    windowManager.updateViewLayout(mRootView, mParams);
+                    if (reMeasureRootView())
+                        windowManager.updateViewLayout(mRootView, mParams);
                 }
             });
         }
@@ -87,14 +94,20 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
     }
 
     @SuppressWarnings("Range")
-    private void reMeasureRootView() {
+    private boolean reMeasureRootView() {
         mRootView.measure(
                 View.MeasureSpec.makeMeasureSpec(ViewGroup.LayoutParams.WRAP_CONTENT,
                         View.MeasureSpec.AT_MOST),
                 View.MeasureSpec.makeMeasureSpec(ViewGroup.LayoutParams.WRAP_CONTENT,
                         View.MeasureSpec.AT_MOST));
-        mParams.height = mRootView.getMeasuredHeight();
-        mParams.width = mRootView.getMeasuredWidth();
+        int newHeight = mRootView.getMeasuredHeight();
+        int newWidth = mRootView.getMeasuredWidth();
+        if (mParams.height != newHeight || mParams.width != newWidth) {
+            mParams.height = newHeight;
+            mParams.width = newWidth;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -103,7 +116,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
     @Override
     public void hide(boolean minimize) {
         if (mRootView != null && mIsWindowShown) {
-            if(minimize) {
+            if (minimize) {
                 //mParams.windowAnimations = R.style.PopupMinimizeAnimation;
                 windowManager.updateViewLayout(mRootView, mParams);
             }
@@ -116,7 +129,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      * Esconde la ventana flotante y detiene el servicio
      */
     @Override
-    public void exit(){
+    public void exit() {
         hide(false);
         stopSelf();
     }
