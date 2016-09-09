@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Floating Windows</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_ok">Ok</string>
+    <string name="btn_approve">Approve</string>
+    <string name="btn_reject">Reject</string>
+    <!-- Samples -->
+    <string name="sample_req_id">R1234</string>
+    <string name="lbl_reject_reason">Rejection reasono</string>
+</resources>
