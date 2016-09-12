@@ -11,32 +11,36 @@ import android.support.v7.app.AppCompatActivity;
 import com.diroag.floatingwindows.R;
 import com.diroag.floatingwindows.sample.floating.SampleView;
 import com.diroag.floatingwindows.service.FloatingWindowService;
+import com.diroag.floatingwindows.service.IFloatingWindowService;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection {
 
-    private FloatingWindowService mService;
+    private IFloatingWindowService mService;
     private SampleView mSampleView;
+    private boolean mBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent serviceIntent = new Intent(getApplication(), FloatingWindowService.class);
-        startService(serviceIntent);
-        bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+        mSampleView = new SampleView(this, "R7721");
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unbindService(this);
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, FloatingWindowService.class);
+        bindService(intent, this, Context.BIND_AUTO_CREATE);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (mService != null)
-            mService.show(mSampleView);
+    public void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(this);
+            mBound = false;
+        }
     }
 
     @Override
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void onServiceConnected(ComponentName componentName, IBinder service) {
         FloatingWindowService.LocalBinder binder = (FloatingWindowService.LocalBinder) service;
         mService = binder.getService();
-        mSampleView = new SampleView(this, "R7721");
+        mBound = true;
         mService.show(mSampleView);
     }
 

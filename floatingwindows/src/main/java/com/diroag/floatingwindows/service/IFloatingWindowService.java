@@ -9,7 +9,7 @@ public interface IFloatingWindowService {
      * Shows the view as a floating window
      * @param view vista
      */
-    void show(AbstractFloatingWindowView view);
+    void show(FloatingWindowView view);
 
     /**
      * Closes the floating window

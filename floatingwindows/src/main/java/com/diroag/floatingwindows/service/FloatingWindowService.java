@@ -64,37 +64,38 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      * Muestra el campo en ventana flotante
      */
     @Override
-    public void show(AbstractFloatingWindowView view) {
+    public void show(FloatingWindowView view) {
         if (view == null)
             throw new IllegalArgumentException("view cannot be null");
-        if (!mIsWindowShown) {
-            if (mRootView == null) {
-                mRootView = BackListenerLayout.wrapView(view.getRootView());
-                setBackListener();
-                view.bindToService(this);
-                setTouchListener();
-                reMeasureRootView();
-                mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View view, int left, int top, int right, int bottom,
-                                               int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        // its possible that the layout is not complete in which case
-                        // we will get all zero values for the positions, so ignore the event
-                        if (left == 0 && top == 0 && right == 0 && bottom == 0) {
-                            return;
-                        }
-                        if (reMeasureRootView())
-                            windowManager.updateViewLayout(mRootView, mParams);
-                    }
-                });
-            }
-            windowManager.addView(mRootView, mParams);
-            mIsWindowShown = true;
+        if (mIsWindowShown) {
+            return;
         }
+        if (mRootView == null) {
+            mRootView = view.createView();
+            setBackListener();
+            view.bindToService(this);
+            setTouchListener();
+            reMeasureRootView();
+            mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    // its possible that the layout is not complete in which case
+                    // we will get all zero values for the positions, so ignore the event
+                    if (left == 0 && top == 0 && right == 0 && bottom == 0) {
+                        return;
+                    }
+                    if (reMeasureRootView())
+                        windowManager.updateViewLayout(mRootView, mParams);
+                }
+            });
+        }
+        mIsWindowShown = true;
+        windowManager.addView(mRootView, mParams);
     }
 
     private void setBackListener() {
-        if(!(mRootView instanceof BackListenerLayout))
+        if (!(mRootView instanceof BackListenerLayout))
             return;
         ((BackListenerLayout) mRootView).setOnBackListener(new BackListenerLayout.OnBackListener() {
             @Override
@@ -125,10 +126,11 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
 
     @Override
     public void dismiss() {
-        if (mRootView != null && mIsWindowShown) {
-            windowManager.removeView(mRootView);
-            mIsWindowShown = false;
+        if (mRootView == null || !mIsWindowShown) {
+            return;
         }
+        windowManager.removeView(mRootView);
+        mIsWindowShown = false;
     }
 
     @Override
@@ -159,7 +161,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      */
     public class LocalBinder extends Binder {
         @NonNull
-        public FloatingWindowService getService() {
+        public IFloatingWindowService getService() {
             return FloatingWindowService.this;
         }
     }

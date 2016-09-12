@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.view.LayoutInflater;
@@ -13,7 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.diroag.floatingwindows.R;
-import com.diroag.floatingwindows.service.AbstractFloatingWindowView;
+import com.diroag.floatingwindows.service.FloatingWindowView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,8 +21,8 @@ import butterknife.ButterKnife;
  * Created by drodriguez on 09/09/2016.
  * this is a sample of a floating view
  */
-public class SampleView extends AbstractFloatingWindowView {
-    private View mRootView;
+public class SampleView extends FloatingWindowView {
+
     @BindView(R.id.txt_requirement_title)
     protected TextView txtRequirementTitle;
 
@@ -42,22 +41,14 @@ public class SampleView extends AbstractFloatingWindowView {
     @BindView(R.id.btn_proceed)
     protected AppCompatButton btnProceed;
 
+    private String mRequirementId;
+
 
     public SampleView(Context context, String requirementId) {
         super(context);
         if (requirementId == null)
             throw new NullPointerException("requirementId can't be null");
-        inflateViews();
-        txtRequirementTitle.setText(requirementId);
-    }
-
-    @SuppressLint("InflateParams")
-    private void inflateViews() {
-        mRootView = LayoutInflater.from(new ContextThemeWrapper(getContext(),
-                R.style.AppTheme)).inflate(
-                R.layout.sample_floating_view, null, false);
-        ButterKnife.bind(this, mRootView);
-        setButtonsClickListeners();
+        mRequirementId = requirementId;
     }
 
     /**
@@ -95,9 +86,15 @@ public class SampleView extends AbstractFloatingWindowView {
         });
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public @NonNull
-    View getRootView() {
-        return mRootView;
+    View onCreateView(LayoutInflater layoutInflater) {
+        View view = layoutInflater.inflate(
+                R.layout.sample_floating_view, null, false);
+        ButterKnife.bind(this, view);
+        setButtonsClickListeners();
+        txtRequirementTitle.setText(mRequirementId);
+        return view;
     }
 }

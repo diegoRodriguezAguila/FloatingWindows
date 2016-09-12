@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 
 /**
  * Created by drodriguez on 02/09/2016.
- * flotable layout
+ * LinearLayout with a listener of back button
  */
 public class BackListenerLayout extends LinearLayout {
 
