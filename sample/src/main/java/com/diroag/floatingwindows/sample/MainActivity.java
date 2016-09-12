@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void onPause() {
         super.onPause();
         if (mService != null)
-            mService.hide(false);
+            mService.dismiss();
     }
 
     @Override

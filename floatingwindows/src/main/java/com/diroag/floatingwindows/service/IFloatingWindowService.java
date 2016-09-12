@@ -12,13 +12,7 @@ public interface IFloatingWindowService {
     void show(AbstractFloatingWindowView view);
 
     /**
-     * Esconde la ventana
-     * @param minimize Si esta en true esconde la ventana con otra animación
+     * Cierra la ventana
      */
-    void hide(boolean minimize);
-
-    /**
-     * Esconde la ventana y detiene el servicio
-     */
-    void exit();
+    void dismiss();
 }

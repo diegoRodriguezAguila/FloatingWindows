@@ -57,23 +57,6 @@ public class SampleView extends AbstractFloatingWindowView {
                 R.layout.sample_floating_view, null, false);
         ButterKnife.bind(this, mRootView);
         setButtonsClickListeners();
-        setFontToAppcompatViews();
-    }
-
-    /**
-     * Pone la custom font a las vistas appcompat a las cuales no se les aplica por alguna razon
-     * la fuente de forma automática
-     */
-    private void setFontToAppcompatViews() {
-        /*Typeface font = getContext().getAssets().get TypefaceUtils.load(getContext().getAssets(),
-                "fonts/helvetica_neue_roman.otf");
-        if (txtRejectReason.getEditText() != null)
-            txtRejectReason.getEditText().setTypeface(font);
-        txtRejectReason.setTypeface(font);
-        rbtnApprove.setTypeface(font);
-        rbtnReject.setTypeface(font);
-        btnCancel.setTypeface(font);
-        btnProceed.setTypeface(font);*/
     }
 
     /**
@@ -98,7 +81,7 @@ public class SampleView extends AbstractFloatingWindowView {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    getService().exit();
+                    getService().dismiss();
             }
         });
         btnProceed.setOnClickListener(new View.OnClickListener() {

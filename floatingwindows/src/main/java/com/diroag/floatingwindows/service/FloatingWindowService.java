@@ -14,8 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.diroag.floatingwindows.view.FloatableLayout;
-
 
 public class FloatingWindowService extends Service implements IFloatingWindowService {
 
@@ -24,7 +22,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
     private transient boolean mIsWindowShown;
     private WindowManager windowManager;
 
-    private FloatableLayout mRootView;
+    private View mRootView;
 
     private WindowManager.LayoutParams mParams;
 
@@ -65,16 +63,10 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
         if (view == null)
             throw new IllegalArgumentException("view cannot be null dude");
         if (!mIsWindowShown) {
-            mRootView = view.getWrappedRootView();
+            mRootView = view.getRootView();
             view.bindToService(this);
             setTouchListener();
             reMeasureRootView();
-            mRootView.setOnBackListener(new FloatableLayout.OnBackListener() {
-                @Override
-                public void onBackPressed() {
-                    hide(false);
-                }
-            });
             windowManager.addView(mRootView, mParams);
             mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
@@ -110,28 +102,12 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
         return false;
     }
 
-    /**
-     * Esconde el campo en ventana flotante
-     */
     @Override
-    public void hide(boolean minimize) {
+    public void dismiss() {
         if (mRootView != null && mIsWindowShown) {
-            if (minimize) {
-                //mParams.windowAnimations = R.style.PopupMinimizeAnimation;
-                windowManager.updateViewLayout(mRootView, mParams);
-            }
             windowManager.removeView(mRootView);
             mIsWindowShown = false;
         }
-    }
-
-    /**
-     * Esconde la ventana flotante y detiene el servicio
-     */
-    @Override
-    public void exit() {
-        hide(false);
-        stopSelf();
     }
 
     /**
