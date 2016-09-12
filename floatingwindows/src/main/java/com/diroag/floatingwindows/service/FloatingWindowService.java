@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 
 
 public class FloatingWindowService extends Service implements IFloatingWindowService {
@@ -24,7 +25,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
 
     private View mRootView;
 
-    private WindowManager.LayoutParams mParams;
+    private LayoutParams mParams;
 
     @Override
     public void onCreate() {
@@ -36,11 +37,10 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      * Pone el touch listener a los campos necesarios
      */
     private void setTouchListener() {
-        mParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+        mParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.TYPE_TOAST,
+                LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
 
         mParams.gravity = Gravity.TOP | Gravity.START;
