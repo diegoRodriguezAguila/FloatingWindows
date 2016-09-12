@@ -2,6 +2,7 @@ package com.diroag.floatingwindows.service;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -14,6 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
+
+import com.diroag.floatingwindows.utils.ActivityUtils;
+import com.diroag.floatingwindows.view.BackListenerLayout;
 
 
 public class FloatingWindowService extends Service implements IFloatingWindowService {
@@ -37,8 +41,8 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      * Pone el touch listener a los campos necesarios
      */
     private void setTouchListener() {
-        int x = mParams!=null?mParams.x:90;
-        int y = mParams!=null?mParams.y:100;
+        int x = mParams != null ? mParams.x : 90;
+        int y = mParams != null ? mParams.y : 100;
         mParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT,
                 LayoutParams.TYPE_TOAST,
@@ -64,7 +68,8 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
         if (view == null)
             throw new IllegalArgumentException("view cannot be null");
         if (!mIsWindowShown) {
-            mRootView = view.getRootView();
+            mRootView = BackListenerLayout.wrapView(view.getRootView());
+            setBackListener();
             view.bindToService(this);
             setTouchListener();
             reMeasureRootView();
@@ -84,6 +89,17 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
             });
         }
         mIsWindowShown = true;
+    }
+
+    private void setBackListener() {
+        ((BackListenerLayout)mRootView).setOnBackListener(new BackListenerLayout.OnBackListener() {
+            @Override
+            public void onBackPressed() {
+                Activity activity = ActivityUtils.resolveActivity(mRootView.getContext());
+                if (activity!=null)
+                    activity.onBackPressed();
+            }
+        });
     }
 
     @SuppressWarnings("Range")
