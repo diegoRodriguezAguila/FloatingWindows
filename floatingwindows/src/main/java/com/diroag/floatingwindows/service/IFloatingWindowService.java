@@ -1,18 +1,28 @@
 package com.diroag.floatingwindows.service;
 
 /**
- * Abstracción del servicio de ventana flotante
+ * Floating window service abstraction
  */
 public interface IFloatingWindowService {
 
     /**
-     * Muestra la vista de ventana flotante adecuada
+     * Shows the view as a floating window
      * @param view vista
      */
     void show(AbstractFloatingWindowView view);
 
     /**
-     * Cierra la ventana
+     * Closes the floating window
      */
     void dismiss();
+
+    /**
+     * Prevents the floating window's position to be changed
+     */
+    void lockPosition();
+
+    /**
+     * Permits the floating window's position to be changed
+     */
+    void unlockPosition();
 }

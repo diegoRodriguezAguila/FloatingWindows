@@ -37,16 +37,17 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      * Pone el touch listener a los campos necesarios
      */
     private void setTouchListener() {
+        int x = mParams!=null?mParams.x:90;
+        int y = mParams!=null?mParams.y:100;
         mParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT,
                 LayoutParams.TYPE_TOAST,
                 LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
 
+        mParams.x = x;
+        mParams.y = y;
         mParams.gravity = Gravity.TOP | Gravity.START;
-        mParams.x = 90;
-        mParams.y = 100;
-        //mParams.windowAnimations = R.style.PopupAnimation;
         mRootView.setOnTouchListener(new FloatingWindowTouchListener());
     }
 
@@ -61,7 +62,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
     @Override
     public void show(AbstractFloatingWindowView view) {
         if (view == null)
-            throw new IllegalArgumentException("view cannot be null dude");
+            throw new IllegalArgumentException("view cannot be null");
         if (!mIsWindowShown) {
             mRootView = view.getRootView();
             view.bindToService(this);
@@ -108,6 +109,16 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
             windowManager.removeView(mRootView);
             mIsWindowShown = false;
         }
+    }
+
+    @Override
+    public void lockPosition() {
+        mRootView.setOnTouchListener(null);
+    }
+
+    @Override
+    public void unlockPosition() {
+        setTouchListener();
     }
 
     /**

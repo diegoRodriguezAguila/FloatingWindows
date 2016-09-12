@@ -2,6 +2,7 @@ package com.diroag.floatingwindows.sample.floating;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.AppCompatButton;
@@ -87,12 +88,16 @@ public class SampleView extends AbstractFloatingWindowView {
         btnProceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isLocked())
+                    unlockPosition();
+                else lockPosition();
             }
         });
     }
 
     @Override
-    public View getRootView() {
+    public @NonNull
+    View getRootView() {
         return mRootView;
     }
 }

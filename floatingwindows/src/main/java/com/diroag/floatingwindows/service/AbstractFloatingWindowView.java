@@ -1,6 +1,7 @@
 package com.diroag.floatingwindows.service;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 /**
@@ -8,6 +9,7 @@ import android.view.View;
  */
 public abstract class AbstractFloatingWindowView {
 
+    private boolean mIsLocked;
     private Context mContext;
     private IFloatingWindowService mService;
 
@@ -32,5 +34,30 @@ public abstract class AbstractFloatingWindowView {
         mService = service;
     }
 
-    public abstract View getRootView();
+    public abstract @NonNull View getRootView();
+
+    /**
+     * Prevents the floating window's position to be changed
+     */
+    public void lockPosition(){
+        mIsLocked = true;
+        mService.lockPosition();
+    }
+
+    /**
+     * Permits the floating window's position to be changed
+     */
+    public void unlockPosition(){
+        mService.unlockPosition();
+        mIsLocked = false;
+    }
+
+    /**
+     * True if the floating window's position is locked
+     * @return true if locked
+     */
+    public boolean isLocked(){
+        return mIsLocked;
+    }
+
 }
