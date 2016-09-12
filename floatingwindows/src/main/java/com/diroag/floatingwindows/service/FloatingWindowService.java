@@ -68,35 +68,39 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
         if (view == null)
             throw new IllegalArgumentException("view cannot be null");
         if (!mIsWindowShown) {
-            mRootView = BackListenerLayout.wrapView(view.getRootView());
-            setBackListener();
-            view.bindToService(this);
-            setTouchListener();
-            reMeasureRootView();
-            windowManager.addView(mRootView, mParams);
-            mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View view, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight,
-                                           int oldBottom) {
-                    // its possible that the layout is not complete in which case
-                    // we will get all zero values for the positions, so ignore the event
-                    if (left == 0 && top == 0 && right == 0 && bottom == 0) {
-                        return;
+            if (mRootView == null) {
+                mRootView = BackListenerLayout.wrapView(view.getRootView());
+                setBackListener();
+                view.bindToService(this);
+                setTouchListener();
+                reMeasureRootView();
+                mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                                               int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        // its possible that the layout is not complete in which case
+                        // we will get all zero values for the positions, so ignore the event
+                        if (left == 0 && top == 0 && right == 0 && bottom == 0) {
+                            return;
+                        }
+                        if (reMeasureRootView())
+                            windowManager.updateViewLayout(mRootView, mParams);
                     }
-                    if (reMeasureRootView())
-                        windowManager.updateViewLayout(mRootView, mParams);
-                }
-            });
+                });
+            }
+            windowManager.addView(mRootView, mParams);
+            mIsWindowShown = true;
         }
-        mIsWindowShown = true;
     }
 
     private void setBackListener() {
-        ((BackListenerLayout)mRootView).setOnBackListener(new BackListenerLayout.OnBackListener() {
+        if(!(mRootView instanceof BackListenerLayout))
+            return;
+        ((BackListenerLayout) mRootView).setOnBackListener(new BackListenerLayout.OnBackListener() {
             @Override
             public void onBackPressed() {
                 Activity activity = ActivityUtils.resolveActivity(mRootView.getContext());
-                if (activity!=null)
+                if (activity != null)
                     activity.onBackPressed();
             }
         });

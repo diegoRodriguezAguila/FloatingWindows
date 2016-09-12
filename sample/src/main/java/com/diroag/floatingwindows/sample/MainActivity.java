@@ -35,9 +35,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onResume() {
         super.onResume();
-        if (mService != null) {
+        if (mService != null)
             mService.show(mSampleView);
-        }
     }
 
     @Override
