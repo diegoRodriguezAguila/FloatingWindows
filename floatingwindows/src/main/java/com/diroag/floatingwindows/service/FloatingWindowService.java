@@ -20,7 +20,7 @@ import com.diroag.floatingwindows.utils.ActivityUtils;
 import com.diroag.floatingwindows.view.BackListenerLayout;
 
 
-public class FloatingWindowService extends Service implements IFloatingWindowService {
+class FloatingWindowService extends Service implements IFloatingWindowService {
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
