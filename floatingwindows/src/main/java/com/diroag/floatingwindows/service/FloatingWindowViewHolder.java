@@ -14,18 +14,19 @@ import com.diroag.floatingwindows.view.BackListenerLayout;
  * Created by drodriguez on 12/09/2016.
  * Floating windows values
  */
-public class FloatingWindowViewHolder {
-    private FloatingWindowView windowView;
-    private boolean mIsWindowShowed;
+class FloatingWindowViewHolder {
+    private FloatingWindowView mWindowView;
     private View mRootView;
     private WindowManager.LayoutParams mParams;
     private LayoutListener mListener;
 
-    public FloatingWindowViewHolder() {
-        this(0, 0);
+    public FloatingWindowViewHolder(FloatingWindowView view) {
+        this(0, 0, view);
     }
 
-    public FloatingWindowViewHolder(int x, int y) {
+    public FloatingWindowViewHolder(int x, int y, FloatingWindowView view) {
+        this.mWindowView = view;
+        this.mRootView = view.createView();
         mParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_TOAST,
@@ -40,43 +41,25 @@ public class FloatingWindowViewHolder {
         setWindowLayoutListener();
     }
 
-    /**
-     *
-     * @return
-     */
-    boolean dismiss(){
-        if (mRootView == null || !mIsWindowShowed) {
+    boolean dismiss() {
+        if (mRootView == null || !mWindowView.isWindowShowed()) {
             return false;
         }
-        mIsWindowShowed = false;
+        mWindowView.setWindowShowed(false);
         return true;
     }
 
     /**
      * Sets the layout listener to get updates about the window layout changes
+     *
      * @param listener layout listener {@link LayoutListener}
      */
-    void setLayoutListener(LayoutListener listener){
+    void setLayoutListener(LayoutListener listener) {
         mListener = listener;
     }
 
-    /**
-     * Sets the window show status
-     * @param isShowed sets is showed
-     */
-    void setIsWindowShowed(boolean isShowed){
-        mIsWindowShowed = isShowed;
-    }
 
-    /**
-     * Returns the visibility status of the window
-     * @return true if its being showed
-     */
-    public boolean isWindowShowed(){
-        return mIsWindowShowed;
-    }
-
-    private void setTouchListener() {
+    void setTouchListener() {
         mRootView.setOnTouchListener(new FloatingWindowTouchListener(mParams) {
             @Override
             public void onParamsChanged() {
@@ -99,7 +82,7 @@ public class FloatingWindowViewHolder {
         });
     }
 
-    private void setWindowLayoutListener(){
+    private void setWindowLayoutListener() {
         mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View view, int left, int top, int right, int bottom,
@@ -133,10 +116,41 @@ public class FloatingWindowViewHolder {
         return false;
     }
 
+    FloatingWindowView getWindowView(){
+        return mWindowView;
+    }
+
+    View getRootView(){
+        return mRootView;
+    }
+
+    WindowManager.LayoutParams getLayoutParams(){
+        return mParams;
+    }
+
+    /**
+     * If its inner rootViews are equals they are equals
+     * @param obj other object
+     * @return true if both rootViews are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof FloatingWindowViewHolder) ||
+                this.mRootView == null) {
+            return false;
+        }
+        FloatingWindowViewHolder other = (FloatingWindowViewHolder) obj;
+        return mRootView.equals(other.mRootView);
+    }
+
+    //region Inner interfaces
+
     /**
      * Observable for window requests
      */
     interface LayoutListener {
         void notifyLayoutUpdate(View rootView, WindowManager.LayoutParams params);
     }
+
+    //endregion
 }

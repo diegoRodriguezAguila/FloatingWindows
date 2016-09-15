@@ -1,58 +1,35 @@
 package com.diroag.floatingwindows.service;
 
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 
-import com.diroag.floatingwindows.utils.ActivityUtils;
-import com.diroag.floatingwindows.view.BackListenerLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 
 class FloatingWindowService extends Service implements IFloatingWindowService {
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
-    private transient boolean mIsWindowShown;
     private WindowManager windowManager;
-
-    private View mRootView;
-
-    private LayoutParams mParams;
+    private List<FloatingWindowViewHolder> mFloatingWindows;
 
     @Override
     public void onCreate() {
         super.onCreate();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        mFloatingWindows = new ArrayList<>();
     }
 
-    /**
-     * Pone el touch listener a los campos necesarios
-     */
-    private void setTouchListener() {
-        int x = mParams != null ? mParams.x : 90;
-        int y = mParams != null ? mParams.y : 100;
-        mParams = new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT,
-                LayoutParams.TYPE_TOAST,
-                LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                PixelFormat.TRANSLUCENT);
-
-        mParams.x = x;
-        mParams.y = y;
-        mParams.gravity = Gravity.TOP | Gravity.START;
-        mRootView.setOnTouchListener(new FloatingWindowTouchListener());
+    @Override
+    public void onDestroy() {
+        this.dismissAll();
     }
 
     @Override
@@ -61,144 +38,177 @@ class FloatingWindowService extends Service implements IFloatingWindowService {
     }
 
     /**
-     * Muestra el campo en ventana flotante
+     * Finds the viewholder
+     *
+     * @param view view
+     * @return viewholder
      */
+    private FloatingWindowViewHolder findViewHolder(FloatingWindowView view) {
+        for (FloatingWindowViewHolder holder : mFloatingWindows) {
+            if (holder.getWindowView().equals(view)) {
+                return holder;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Shows a window
+     *
+     * @param viewHolder view holder
+     */
+    private void show(FloatingWindowViewHolder viewHolder) {
+        FloatingWindowView view = viewHolder.getWindowView();
+        if (view.isWindowShowed()) {
+            return;
+        }
+        view.bindToService(this);
+        viewHolder.setLayoutListener(new FloatingWindowViewHolder.LayoutListener() {
+            @Override
+            public void notifyLayoutUpdate(View rootView, WindowManager.LayoutParams params) {
+                windowManager.updateViewLayout(rootView, params);
+            }
+        });
+        windowManager.addView(viewHolder.getRootView(), viewHolder.getLayoutParams());
+        view.setWindowShowed(true);
+    }
+
+    /**
+     * Removes a window and removes from the window list
+     *
+     * @param viewHolder view holder
+     */
+    private boolean dismiss(FloatingWindowViewHolder viewHolder) {
+        return hide(viewHolder) && mFloatingWindows.remove(viewHolder);
+    }
+
+    /**
+     * Hides a window. but it doesn't get removed from the window list
+     *
+     * @param viewHolder view holder
+     * @return true if it could be hide
+     */
+    private boolean hide(FloatingWindowViewHolder viewHolder) {
+        FloatingWindowView view = viewHolder.getWindowView();
+        if (viewHolder.getRootView() == null || !view.isWindowShowed()) {
+            return false;
+        }
+        windowManager.removeView(viewHolder.getRootView());
+        view.setWindowShowed(false);
+        return true;
+    }
+
+    /**
+     * Locks the position of the window
+     *
+     * @param viewHolder view holder
+     */
+    private void lock(FloatingWindowViewHolder viewHolder) {
+        FloatingWindowView view = viewHolder.getWindowView();
+        if (view.isLocked())
+            return;
+        viewHolder.getRootView().setOnTouchListener(null);
+        view.setLocked(true);
+    }
+
+    /**
+     * Unlocks the position of the window
+     *
+     * @param viewHolder view holder
+     */
+    private void unlock(FloatingWindowViewHolder viewHolder) {
+        FloatingWindowView view = viewHolder.getWindowView();
+        if (!view.isLocked())
+            return;
+        viewHolder.setTouchListener();
+        view.setLocked(false);
+    }
+
+    //region interface methods
+
     @Override
     public void show(FloatingWindowView view) {
         if (view == null)
             throw new IllegalArgumentException("view cannot be null");
-        if (mIsWindowShown) {
-            return;
+        FloatingWindowViewHolder viewHolder = findViewHolder(view);
+        if (viewHolder == null) {
+            viewHolder = new FloatingWindowViewHolder(view);
+            mFloatingWindows.add(viewHolder);
         }
-        if (mRootView == null) {
-            mRootView = view.createView();
-            setBackListener();
-            view.bindToService(this);
-            setTouchListener();
-            reMeasureRootView();
-            mRootView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View view, int left, int top, int right, int bottom,
-                                           int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    // its possible that the layout is not complete in which case
-                    // we will get all zero values for the positions, so ignore the event
-                    if (left == 0 && top == 0 && right == 0 && bottom == 0) {
-                        return;
-                    }
-                    if (reMeasureRootView())
-                        windowManager.updateViewLayout(mRootView, mParams);
-                }
-            });
-        }
-        mIsWindowShown = true;
-        windowManager.addView(mRootView, mParams);
-    }
-
-    private void setBackListener() {
-        if (!(mRootView instanceof BackListenerLayout))
-            return;
-        ((BackListenerLayout) mRootView).setOnBackListener(new BackListenerLayout.OnBackListener() {
-            @Override
-            public void onBackPressed() {
-                Activity activity = ActivityUtils.resolveActivity(mRootView.getContext());
-                if (activity != null)
-                    activity.onBackPressed();
-            }
-        });
-    }
-
-    @SuppressWarnings("Range")
-    private boolean reMeasureRootView() {
-        mRootView.measure(
-                View.MeasureSpec.makeMeasureSpec(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        View.MeasureSpec.AT_MOST),
-                View.MeasureSpec.makeMeasureSpec(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        View.MeasureSpec.AT_MOST));
-        int newHeight = mRootView.getMeasuredHeight();
-        int newWidth = mRootView.getMeasuredWidth();
-        if (mParams.height != newHeight || mParams.width != newWidth) {
-            mParams.height = newHeight;
-            mParams.width = newWidth;
-            return true;
-        }
-        return false;
+        show(viewHolder);
     }
 
     @Override
-    public void dismiss() {
-        if (mRootView == null || !mIsWindowShown) {
-            return;
+    public void showAll() {
+        for (FloatingWindowViewHolder holder : mFloatingWindows) {
+            show(holder);
         }
-        windowManager.removeView(mRootView);
-        mIsWindowShown = false;
     }
 
     @Override
-    public void lockPosition() {
-        mRootView.setOnTouchListener(null);
+    public void dismiss(FloatingWindowView view) {
+        FloatingWindowViewHolder viewHolder = findViewHolder(view);
+        if (viewHolder == null)
+            return;
+        dismiss(viewHolder);
     }
 
     @Override
-    public void unlockPosition() {
-        setTouchListener();
+    public void dismissAll() {
+        for (int i = 0; i < mFloatingWindows.size(); i++) {
+            if (dismiss(mFloatingWindows.get(i)))
+                i--;
+        }
     }
 
-    /**
-     * Devuelve true si la vista ya está mostrada
-     *
-     * @return true if is shown
-     */
-    public boolean isWindowShown() {
-        return mIsWindowShown;
+    @Override
+    public void hideAll() {
+        for (FloatingWindowViewHolder holder : mFloatingWindows) {
+            hide(holder);
+        }
     }
+
+    @Override
+    public void lockPosition(FloatingWindowView view) {
+        FloatingWindowViewHolder viewHolder = findViewHolder(view);
+        if (viewHolder == null)
+            return;
+        lock(viewHolder);
+    }
+
+    @Override
+    public void lockAll() {
+        for (FloatingWindowViewHolder holder : mFloatingWindows) {
+            lock(holder);
+        }
+    }
+
+    @Override
+    public void unlockPosition(FloatingWindowView view) {
+        FloatingWindowViewHolder viewHolder = findViewHolder(view);
+        if (viewHolder == null)
+            return;
+        unlock(viewHolder);
+    }
+
+    @Override
+    public void unlockAll() {
+        for (FloatingWindowViewHolder holder : mFloatingWindows) {
+            unlock(holder);
+        }
+    }
+
+    //endregion
 
     //region Inner Classes
 
     /**
-     * Binder para la clase
-     *
-     * @author drodriguez
+     * Binder for service
      */
     public class LocalBinder extends Binder {
         @NonNull
         public IFloatingWindowService getService() {
             return FloatingWindowService.this;
-        }
-    }
-
-    /**
-     * Clase de touch listener para la vista de la
-     * ventana flotante
-     */
-    private class FloatingWindowTouchListener implements View.OnTouchListener {
-
-        private int initialX;
-        private int initialY;
-        private float initialTouchX;
-        private float initialTouchY;
-
-        @SuppressLint("ClickableViewAccessibility")
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    initialX = mParams.x;
-                    initialY = mParams.y;
-                    initialTouchX = event.getRawX();
-                    initialTouchY = event.getRawY();
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    mParams.x = initialX
-                            + (int) (event.getRawX() - initialTouchX);
-                    mParams.y = initialY
-                            + (int) (event.getRawY() - initialTouchY);
-                    windowManager.updateViewLayout(mRootView,
-                            mParams);
-                    return true;
-            }
-            return false;
         }
     }
 

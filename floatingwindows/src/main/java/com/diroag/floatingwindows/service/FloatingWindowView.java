@@ -12,7 +12,8 @@ import com.diroag.floatingwindows.view.BackListenerLayout;
  */
 public abstract class FloatingWindowView {
 
-    private boolean mIsLocked;
+    private boolean mWindowShowed;
+    private boolean mLocked;
     private Context mContext;
     private IFloatingWindowService mService;
 
@@ -24,14 +25,14 @@ public abstract class FloatingWindowView {
         return mContext;
     }
 
-    public IFloatingWindowService getService() {
+    IFloatingWindowService getService() {
         if (mService == null)
             throw new IllegalStateException("Service was not set nor binded to this view! cannot " +
                     "use getService()");
         return mService;
     }
 
-    public void bindToService(IFloatingWindowService service) {
+    void bindToService(IFloatingWindowService service) {
         if (service == null)
             throw new IllegalArgumentException("Service cannot be null");
         mService = service;
@@ -61,16 +62,21 @@ public abstract class FloatingWindowView {
      * Prevents the floating window's position to be changed
      */
     public void lockPosition() {
-        mIsLocked = true;
-        mService.lockPosition();
+        mService.lockPosition(this);
     }
 
     /**
      * Permits the floating window's position to be changed
      */
     public void unlockPosition() {
-        mService.unlockPosition();
-        mIsLocked = false;
+        mService.unlockPosition(this);
+    }
+
+    /**
+     * Closes the floating window
+     */
+    public void dismiss(){
+        mService.dismiss(this);
     }
 
     /**
@@ -79,7 +85,30 @@ public abstract class FloatingWindowView {
      * @return true if locked
      */
     public boolean isLocked() {
-        return mIsLocked;
+        return mLocked;
     }
 
+    /**
+     * Sets the variable of locked to true or false
+     * @param locked locked or not
+     */
+    void setLocked(boolean locked){
+        this.mLocked = locked;
+    }
+
+    /**
+     * True if the floating window is being displayed
+     * @return true if displayed
+     */
+    public boolean isWindowShowed(){
+        return mWindowShowed;
+    }
+
+    /**
+     * Sets the variable of showed to true or false
+     * @param showed showed or not
+     */
+    void setWindowShowed(boolean showed){
+        this.mWindowShowed = showed;
+    }
 }

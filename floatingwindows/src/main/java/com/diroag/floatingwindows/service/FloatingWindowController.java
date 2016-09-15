@@ -12,14 +12,14 @@ import android.util.Log;
 
 import com.diroag.floatingwindows.utils.ActivityUtils;
 
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.SynchronousQueue;
 
 import static android.app.Application.ActivityLifecycleCallbacks;
 
 /**
  * Created by drodriguez on 13/09/2016.
- * Controller for floating window
+ * Controller for floating windows
  */
 public class FloatingWindowController {
 
@@ -70,10 +70,14 @@ public class FloatingWindowController {
      */
     private FloatingWindowController(Context context) {
         this.mContext = context;
-        this.mPendingViews = new SynchronousQueue<>();
+        this.mPendingViews = new ArrayDeque<>();
         onCreate();
     }
 
+    /**
+     * Shows the floating window view
+     * @param floatingWindow floating window view {@link FloatingWindowView}
+     */
     public void show(FloatingWindowView floatingWindow) {
         synchronized (mLock) {
             if (mIsDestroyed)
@@ -84,6 +88,23 @@ public class FloatingWindowController {
                 return;
             }
             mService.show(floatingWindow);
+        }
+    }
+
+    /**
+     * Closes the floating window view
+     * @param floatingWindow floating window view {@link FloatingWindowView}
+     */
+    public void dismiss(FloatingWindowView floatingWindow) {
+        synchronized (mLock) {
+            if (mIsDestroyed)
+                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+                        "cannot call dismiss() method.");
+            if (!mBound) {
+                mPendingViews.remove(floatingWindow);
+                return;
+            }
+            mService.dismiss(floatingWindow);
         }
     }
 
@@ -123,13 +144,13 @@ public class FloatingWindowController {
 
     private void onResume() {
         if (mService != null) {
-            mService.show(null);
+            mService.showAll();
         }
     }
 
     private void onPause() {
         if (mService != null) {
-            mService.dismiss();
+            mService.hideAll();
         }
     }
 

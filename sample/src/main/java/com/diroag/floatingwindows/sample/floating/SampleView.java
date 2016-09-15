@@ -73,13 +73,13 @@ public class SampleView extends FloatingWindowView {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    getService().dismiss();
+                dismiss();
             }
         });
         btnProceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isLocked())
+                if (isLocked())
                     unlockPosition();
                 else lockPosition();
             }
@@ -88,7 +88,8 @@ public class SampleView extends FloatingWindowView {
 
     @SuppressLint("InflateParams")
     @Override
-    public @NonNull
+    public
+    @NonNull
     View onCreateView(LayoutInflater layoutInflater) {
         View view = layoutInflater.inflate(
                 R.layout.sample_floating_view, null, false);
