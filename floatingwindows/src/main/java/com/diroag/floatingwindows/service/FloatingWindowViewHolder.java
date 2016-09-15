@@ -21,10 +21,10 @@ class FloatingWindowViewHolder {
     private LayoutListener mListener;
 
     public FloatingWindowViewHolder(FloatingWindowView view) {
-        this(0, 0, view);
+        this(view, Gravity.TOP | Gravity.START, 0, 0);
     }
 
-    public FloatingWindowViewHolder(int x, int y, FloatingWindowView view) {
+    public FloatingWindowViewHolder(FloatingWindowView view, int gravity, int x, int y) {
         this.mWindowView = view;
         this.mRootView = view.createView();
         mParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
@@ -32,21 +32,13 @@ class FloatingWindowViewHolder {
                 WindowManager.LayoutParams.TYPE_TOAST,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
-        mParams.gravity = Gravity.TOP | Gravity.START;
+        mParams.gravity = gravity;
         mParams.x = x;
         mParams.y = y;
         setTouchListener();
         setBackListener();
         reMeasureRootView();
         setWindowLayoutListener();
-    }
-
-    boolean dismiss() {
-        if (mRootView == null || !mWindowView.isWindowShowed()) {
-            return false;
-        }
-        mWindowView.setWindowShowed(false);
-        return true;
     }
 
     /**
@@ -126,6 +118,15 @@ class FloatingWindowViewHolder {
 
     WindowManager.LayoutParams getLayoutParams(){
         return mParams;
+    }
+
+    void setPosition(int gravity, int x, int y){
+        mParams.gravity = gravity;
+        mParams.x = x;
+        mParams.y = y;
+        reMeasureRootView();
+        if (mListener != null)
+            mListener.notifyLayoutUpdate(mRootView, mParams);
     }
 
     /**

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.diroag.floatingwindows.utils.ViewUtils;
 import com.diroag.floatingwindows.view.BackListenerLayout;
 
 /**
@@ -12,15 +13,31 @@ import com.diroag.floatingwindows.view.BackListenerLayout;
  */
 public abstract class FloatingWindowView {
 
+    private int mId;
     private boolean mWindowShowed;
     private boolean mLocked;
     private Context mContext;
     private IFloatingWindowService mService;
 
     public FloatingWindowView(Context context) {
+        mId = ViewUtils.generateViewId();
         mContext = context;
     }
 
+    /**
+     * Gets the assigned FloatingWindowView id
+     *
+     * @return id
+     */
+    public int getId() {
+        return mId;
+    }
+
+    /**
+     * The context used to inflate and handle this view
+     *
+     * @return context
+     */
     public Context getContext() {
         return mContext;
     }
@@ -62,21 +79,27 @@ public abstract class FloatingWindowView {
      * Prevents the floating window's position to be changed
      */
     public void lockPosition() {
-        mService.lockPosition(this);
+        if (mService != null) {
+            mService.lockPosition(this);
+        }
     }
 
     /**
      * Permits the floating window's position to be changed
      */
     public void unlockPosition() {
-        mService.unlockPosition(this);
+        if (mService != null) {
+            mService.unlockPosition(this);
+        }
     }
 
     /**
      * Closes the floating window
      */
-    public void dismiss(){
-        mService.dismiss(this);
+    public void dismiss() {
+        if (mService != null) {
+            mService.dismiss(this);
+        }
     }
 
     /**
@@ -90,25 +113,39 @@ public abstract class FloatingWindowView {
 
     /**
      * Sets the variable of locked to true or false
+     *
      * @param locked locked or not
      */
-    void setLocked(boolean locked){
+    void setLocked(boolean locked) {
         this.mLocked = locked;
     }
 
     /**
      * True if the floating window is being displayed
+     *
      * @return true if displayed
      */
-    public boolean isWindowShowed(){
+    public boolean isWindowShowed() {
         return mWindowShowed;
     }
 
     /**
      * Sets the variable of showed to true or false
+     *
      * @param showed showed or not
      */
-    void setWindowShowed(boolean showed){
+    void setWindowShowed(boolean showed) {
         this.mWindowShowed = showed;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof FloatingWindowView &&
+                mId == ((FloatingWindowView) obj).mId;
+    }
+
+    @Override
+    public int hashCode() {
+        return mId;
     }
 }
