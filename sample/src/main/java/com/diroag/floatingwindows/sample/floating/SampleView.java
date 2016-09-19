@@ -5,17 +5,20 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.diroag.floatingwindows.R;
 import com.diroag.floatingwindows.service.FloatingWindowView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by drodriguez on 09/09/2016.
@@ -35,11 +38,11 @@ public class SampleView extends FloatingWindowView {
 
     @BindView(R.id.txt_reject_reason)
     protected TextInputLayout txtRejectReason;
-
-    @BindView(R.id.btn_cancel)
-    protected AppCompatButton btnCancel;
     @BindView(R.id.btn_proceed)
     protected AppCompatButton btnProceed;
+    @BindView(R.id.btn_lock)
+    protected AppCompatImageButton btnLock;
+
 
     private String mRequirementId;
 
@@ -70,20 +73,6 @@ public class SampleView extends FloatingWindowView {
                 }
             }
         });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-        btnProceed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isLocked())
-                    unlockPosition();
-                else lockPosition();
-            }
-        });
     }
 
     @SuppressLint("InflateParams")
@@ -97,5 +86,33 @@ public class SampleView extends FloatingWindowView {
         setButtonsClickListeners();
         txtRequirementTitle.setText(mRequirementId);
         return view;
+    }
+
+    @OnClick(R.id.btn_cancel)
+    public void btnCancelClick(View v){
+        dismiss();
+    }
+
+    @OnClick(R.id.btn_proceed)
+    public void btnProceedClick(View v){
+        dismiss();
+    }
+
+    @OnClick(R.id.btn_close)
+    public void btnCloseClick(View v){
+        dismiss();
+    }
+
+    @OnClick(R.id.btn_lock)
+    public void btnLockClick(View v){
+        if (isLocked()) {
+            unlockPosition();
+            btnLock.setImageResource(R.drawable.unlock);
+            Toast.makeText(getContext(),"Unlocked!",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        lockPosition();
+        btnLock.setImageResource(R.drawable.lock);
+        Toast.makeText(getContext(),"Locked!",Toast.LENGTH_SHORT).show();
     }
 }
