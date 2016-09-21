@@ -19,6 +19,6 @@ public class MainActivity extends AppCompatActivity {
         mSampleView = new SampleView(this, "R7721");
         FloatingWindowController fwc = FloatingWindowController.create(this);
         fwc.showAtLocation(mSampleView, Gravity.TOP | Gravity.START, 500, 500);
-        fwc.show(new SampleView(this, "OTRA"));
+        fwc.show(new SampleView(this, "OTHER"));
     }
 }

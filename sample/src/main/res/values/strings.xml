@@ -6,5 +6,5 @@
     <string name="btn_reject">Reject</string>
     <!-- Samples -->
     <string name="sample_req_id">R1234</string>
-    <string name="lbl_reject_reason">Rejection reasono</string>
+    <string name="lbl_reject_reason">Rejection reason</string>
 </resources>
