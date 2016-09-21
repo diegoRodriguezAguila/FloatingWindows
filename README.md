@@ -11,8 +11,8 @@ lifecycle.
 
 ### Screenshots
 
-![](https://github.com/diegoRodriguezAguila/FloatingWindows/tree/master/screenshots/screenshot-1.png)
-![](https://github.com/diegoRodriguezAguila/FloatingWindows/tree/master/screenshots/screenshot-2.png)
+![](https://github.com/diegoRodriguezAguila/FloatingWindows/blob/master/screenshots/screenshot-1.png?raw=true =360x576)
+![](https://github.com/diegoRodriguezAguila/FloatingWindows/blob/master/screenshots/screenshot-2.png?raw=true =360x576)
 
 ### Setup
 
