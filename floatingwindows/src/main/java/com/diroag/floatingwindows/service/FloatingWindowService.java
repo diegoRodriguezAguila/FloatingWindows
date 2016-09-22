@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class FloatingWindowService extends Service implements IFloatingWindowService {
+public class FloatingWindowService extends Service implements IFloatingWindowService {
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();

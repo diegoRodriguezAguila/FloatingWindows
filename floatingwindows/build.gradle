@@ -8,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 24
         versionCode 1
-        versionName "0.1.1"
+        versionName "0.1.2"
     }
     buildTypes {
         release {
@@ -31,7 +31,7 @@ ext {
     siteUrl = 'https://github.com/diegoRodriguezAguila/FloatingWindows'
     gitUrl = 'https://github.com/diegoRodriguezAguila/FloatingWindows.git'
 
-    libraryVersion = '0.1.1'
+    libraryVersion = '0.1.2'
 
     developerId = 'diroag'
     developerName = 'Diego Rodriguez'
@@ -44,7 +44,7 @@ ext {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-annotations:24.2.0'
+    compile 'com.android.support:support-annotations:24.2.1'
 }
 
 // Place it at the end of the file

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 
-import com.diroag.floatingwindows.R;
 import com.diroag.floatingwindows.sample.floating.SampleView;
 import com.diroag.floatingwindows.service.FloatingWindowController;
 

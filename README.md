@@ -18,7 +18,7 @@ lifecycle.
 
 To setup de library just add the dependency to your module-level gradle:
 
-`compile 'com.diroag.floatingwindows:floatingwindows:0.1.1'`
+`compile 'com.diroag.floatingwindows:floatingwindows:0.1.2'`
 
 ### Usage
 

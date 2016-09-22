@@ -13,7 +13,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.diroag.floatingwindows.R;
+import com.diroag.floatingwindows.sample.R;
 import com.diroag.floatingwindows.service.FloatingWindowView;
 
 import butterknife.BindView;
