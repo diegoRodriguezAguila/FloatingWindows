@@ -55,7 +55,7 @@ public class SampleView extends FloatingWindowView {
     }
 
     /**
-     * Pone los click listeners se los botones
+     * Put click listeners for radio buttons
      */
     private void setButtonsClickListeners() {
         radioGroupAction.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
