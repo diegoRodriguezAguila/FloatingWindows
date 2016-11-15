@@ -9,7 +9,8 @@ import com.diroag.floatingwindows.utils.ViewUtils;
 import com.diroag.floatingwindows.view.BackListenerLayout;
 
 /**
- * Abstracción de cualquier vista para la ventana flotante
+ * Floating window view abstraction. Views desired to be shown as floating windows must inherit
+ * this class and implement the method: {@link #onCreateView(LayoutInflater)}
  */
 public abstract class FloatingWindowView {
 

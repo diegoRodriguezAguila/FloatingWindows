@@ -6,8 +6,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 /**
- * Clase de touch listener para la vista de la
- * ventana flotante
+ * Touch listener for floating window
  */
 abstract class FloatingWindowTouchListener implements View.OnTouchListener {
 

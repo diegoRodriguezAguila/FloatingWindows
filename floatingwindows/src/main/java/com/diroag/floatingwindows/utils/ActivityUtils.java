@@ -6,12 +6,12 @@ import android.content.ContextWrapper;
 
 /**
  * Created by Diego on 10/7/2016.
- * activity utils
+ * Activity utils
  */
 public class ActivityUtils {
 
     /**
-     * Resolves the context's activity
+     * Gets the activity of a context.
      * @param context context
      * @return resolved activity, null if the context wasn't an activity
      */

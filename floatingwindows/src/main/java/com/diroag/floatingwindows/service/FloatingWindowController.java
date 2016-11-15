@@ -19,8 +19,9 @@ import java.util.Queue;
 import static android.app.Application.ActivityLifecycleCallbacks;
 
 /**
- * Created by drodriguez on 13/09/2016.
- * Controller for floating windows
+ * Controller for floating windows. This class is meant to manage all the floating windows.
+ * It provides the required methods to handle window showing and hiding. To get an instance of
+ * this class you must call static method {@link #create(Context)}
  */
 public class FloatingWindowController implements IFloatingWindowService {
 
@@ -280,7 +281,7 @@ public class FloatingWindowController implements IFloatingWindowService {
     }
 
     /**
-     * Destroys the references and stop the floating windows services. this must be called
+     * Destroys the references and stop the floating windows services. This must be called
      * for non-Activity contexts like services.
      */
     public void destroy() {
