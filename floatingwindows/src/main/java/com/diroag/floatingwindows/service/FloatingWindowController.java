@@ -1,6 +1,7 @@
 package com.diroag.floatingwindows.service;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -374,8 +375,10 @@ public class FloatingWindowController implements IFloatingWindowService {
      */
     private void hookLifeCycle() {
         final Activity activity = ActivityUtils.resolveActivity(mContext);
-        if (activity == null)
+        if (activity == null) {
+            hookToAppLifeCycle();
             return;
+        }
         mActivityCallbacks = new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity a, Bundle savedInstanceState) {
@@ -418,6 +421,52 @@ public class FloatingWindowController implements IFloatingWindowService {
             }
         };
         activity.getApplication().registerActivityLifecycleCallbacks(mActivityCallbacks);
+    }
+
+    private void hookToAppLifeCycle() {
+        mActivityCallbacks = new ActivityLifecycleCallbacks() {
+            private int activityReferences = 0;
+            private boolean isActivityChangingConfigurations = false;
+
+            @Override
+            public void onActivityCreated(Activity a, Bundle savedInstanceState) {
+            }
+
+            @Override
+            public void onActivityStarted(Activity a) {
+                if (++activityReferences == 1 && !isActivityChangingConfigurations) {
+                    onResume();
+                }
+            }
+
+            @Override
+            public void onActivityResumed(Activity a) {
+            }
+
+            @Override
+            public void onActivityPaused(Activity a) {
+            }
+
+            @Override
+            public void onActivityStopped(Activity a) {
+                isActivityChangingConfigurations = a.isChangingConfigurations();
+                if (--activityReferences == 0 && !isActivityChangingConfigurations) {
+                    onPause();
+                }
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity a, Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity a) {
+                a.getApplication().unregisterActivityLifecycleCallbacks(mActivityCallbacks);
+                onDestroy();
+            }
+        };
+        ((Application) mContext.getApplicationContext()).registerActivityLifecycleCallbacks(mActivityCallbacks);
     }
 
     private static class WindowPosition {
