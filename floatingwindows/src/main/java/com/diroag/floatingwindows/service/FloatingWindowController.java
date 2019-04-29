@@ -458,7 +458,7 @@ public class FloatingWindowController implements IFloatingWindowService {
         public void onActivityStopped(Activity a) {
             isActivityChangingConfigurations = a.isChangingConfigurations();
             activityReferences.remove(a.getClass().getCanonicalName());
-            if (!isActivityChangingConfigurations && activityReferences.size()==0) {
+            if (!isActivityChangingConfigurations && activityReferences.size() == 0) {
                 onPause();
             }
         }
@@ -470,8 +470,10 @@ public class FloatingWindowController implements IFloatingWindowService {
 
         @Override
         public void onActivityDestroyed(Activity a) {
-            a.getApplication().unregisterActivityLifecycleCallbacks(this);
-            onDestroy();
+            if (!isActivityChangingConfigurations && activityReferences.size() == 0) {
+                a.getApplication().unregisterActivityLifecycleCallbacks(this);
+                onDestroy();
+            }
         }
 
     }
