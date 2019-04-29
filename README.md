@@ -46,6 +46,11 @@ There are methods that you can call from the controller class or your
 floating window views like: `dismiss(), lock(), unlock()`, but the show
 methods can only be called from the controller.
 
+### Permissions
+Remember to request the permission to draw over windows:
+`Settings.ACTION_MANAGE_OVERLAY_PERMISSION` before using the show
+method.
+
 ### License
 
 Copyright 2016 Diego Rodriguez

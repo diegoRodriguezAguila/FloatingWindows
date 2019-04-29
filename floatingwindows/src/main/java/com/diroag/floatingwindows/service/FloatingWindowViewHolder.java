@@ -2,6 +2,7 @@ package com.diroag.floatingwindows.service;
 
 import android.app.Activity;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,9 @@ import android.view.WindowManager;
 
 import com.diroag.floatingwindows.utils.ActivityUtils;
 import com.diroag.floatingwindows.view.BackListenerLayout;
+
+import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+import static android.view.WindowManager.LayoutParams.TYPE_TOAST;
 
 /**
  * Created by drodriguez on 12/09/2016.
@@ -29,7 +33,7 @@ class FloatingWindowViewHolder {
         this.mRootView = view.createView();
         mParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_TOAST,
+                ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? TYPE_APPLICATION_OVERLAY : TYPE_TOAST),
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
         mParams.gravity = gravity;
