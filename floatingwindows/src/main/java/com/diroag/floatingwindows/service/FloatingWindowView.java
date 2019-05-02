@@ -1,10 +1,12 @@
 package com.diroag.floatingwindows.service;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.diroag.floatingwindows.utils.ActivityUtils;
 import com.diroag.floatingwindows.utils.ViewUtils;
 import com.diroag.floatingwindows.view.BackListenerLayout;
 
@@ -74,6 +76,18 @@ public abstract class FloatingWindowView {
     View createView() {
         return BackListenerLayout
                 .wrapView(onCreateView(LayoutInflater.from(mContext)));
+    }
+
+    /**
+     * Back pressed event, invoked whenever back key is pressed and the floating window is shown.
+     * It's advised to override this method so the floating view can pass the event to views behind.
+     * By default and if the inflating context is an activity, it invokes back pressed for that
+     * specific activity
+     */
+    public void onBackPressed() {
+        Activity activity = ActivityUtils.resolveActivity(mContext);
+        if (activity != null)
+            activity.onBackPressed();
     }
 
     /**

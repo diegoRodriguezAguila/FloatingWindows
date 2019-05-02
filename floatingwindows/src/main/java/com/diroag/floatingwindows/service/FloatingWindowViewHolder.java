@@ -1,6 +1,5 @@
 package com.diroag.floatingwindows.service;
 
-import android.app.Activity;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.view.Gravity;
@@ -8,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.diroag.floatingwindows.utils.ActivityUtils;
 import com.diroag.floatingwindows.view.BackListenerLayout;
 
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
@@ -66,15 +64,14 @@ class FloatingWindowViewHolder {
     }
 
     private void setBackListener() {
-        if (!(mRootView instanceof BackListenerLayout) ||
-                ActivityUtils.resolveActivity(mRootView.getContext()) == null)
+        if (!(mRootView instanceof BackListenerLayout))
             return;
         ((BackListenerLayout) mRootView).setOnBackListener(new BackListenerLayout.OnBackListener() {
             @Override
             public void onBackPressed() {
-                Activity activity = ActivityUtils.resolveActivity(mRootView.getContext());
-                if (activity != null)
-                    activity.onBackPressed();
+                if (mWindowView != null) {
+                    mWindowView.onBackPressed();
+                }
             }
         });
     }
