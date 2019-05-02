@@ -66,7 +66,8 @@ class FloatingWindowViewHolder {
     }
 
     private void setBackListener() {
-        if (!(mRootView instanceof BackListenerLayout))
+        if (!(mRootView instanceof BackListenerLayout) ||
+                ActivityUtils.resolveActivity(mRootView.getContext()) == null)
             return;
         ((BackListenerLayout) mRootView).setOnBackListener(new BackListenerLayout.OnBackListener() {
             @Override
@@ -112,19 +113,19 @@ class FloatingWindowViewHolder {
         return false;
     }
 
-    FloatingWindowView getWindowView(){
+    FloatingWindowView getWindowView() {
         return mWindowView;
     }
 
-    View getRootView(){
+    View getRootView() {
         return mRootView;
     }
 
-    WindowManager.LayoutParams getLayoutParams(){
+    WindowManager.LayoutParams getLayoutParams() {
         return mParams;
     }
 
-    void setPosition(int gravity, int x, int y){
+    void setPosition(int gravity, int x, int y) {
         mParams.gravity = gravity;
         mParams.x = x;
         mParams.y = y;
@@ -135,6 +136,7 @@ class FloatingWindowViewHolder {
 
     /**
      * If its inner rootViews are equals they are equals
+     *
      * @param obj other object
      * @return true if both rootViews are equal
      */

@@ -1,7 +1,6 @@
 package com.diroag.floatingwindows.service;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +14,6 @@ import android.util.SparseArray;
 import com.diroag.floatingwindows.utils.ActivityUtils;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 
 import static android.app.Application.ActivityLifecycleCallbacks;
@@ -378,7 +375,6 @@ public class FloatingWindowController implements IFloatingWindowService {
     private void hookLifeCycle() {
         final Activity activity = ActivityUtils.resolveActivity(mContext);
         if (activity == null) {
-            hookToAppLifeCycle();
             return;
         }
         mActivityCallbacks = new ActivityLifecycleCallbacks() {
@@ -423,59 +419,6 @@ public class FloatingWindowController implements IFloatingWindowService {
             }
         };
         activity.getApplication().registerActivityLifecycleCallbacks(mActivityCallbacks);
-    }
-
-    private void hookToAppLifeCycle() {
-        mActivityCallbacks = new ForegroundLifecycleCallback();
-        ((Application) mContext.getApplicationContext()).registerActivityLifecycleCallbacks(mActivityCallbacks);
-    }
-
-    private class ForegroundLifecycleCallback implements Application.ActivityLifecycleCallbacks {
-        private List<String> activityReferences = new ArrayList<>();
-        private boolean isActivityChangingConfigurations = false;
-
-        @Override
-        public void onActivityCreated(Activity a, Bundle savedInstanceState) {
-        }
-
-        @Override
-        public void onActivityStarted(Activity a) {
-            activityReferences.add(a.getClass().getCanonicalName());
-            if (!isActivityChangingConfigurations && activityReferences.size() == 1) {
-                onResume();
-            }
-        }
-
-        @Override
-        public void onActivityResumed(Activity a) {
-        }
-
-        @Override
-        public void onActivityPaused(Activity a) {
-        }
-
-        @Override
-        public void onActivityStopped(Activity a) {
-            isActivityChangingConfigurations = a.isChangingConfigurations();
-            activityReferences.remove(a.getClass().getCanonicalName());
-            if (!isActivityChangingConfigurations && activityReferences.size() == 0) {
-                onPause();
-            }
-        }
-
-        @Override
-        public void onActivitySaveInstanceState(Activity a, Bundle outState) {
-
-        }
-
-        @Override
-        public void onActivityDestroyed(Activity a) {
-            if (!isActivityChangingConfigurations && activityReferences.size() == 0) {
-                a.getApplication().unregisterActivityLifecycleCallbacks(this);
-                onDestroy();
-            }
-        }
-
     }
 
     private static class WindowPosition {
