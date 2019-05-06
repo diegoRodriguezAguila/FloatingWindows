@@ -34,11 +34,11 @@ public class BackListenerLayout extends LinearLayout {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            if (mListener != null) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && mListener != null) {
+            if (event.getAction() == KeyEvent.ACTION_UP) {
                 mListener.onBackPressed();
-                return true;
             }
+            return true;
         }
         return super.dispatchKeyEvent(event);
     }
