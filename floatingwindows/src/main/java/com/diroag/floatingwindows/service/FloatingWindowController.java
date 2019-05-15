@@ -298,20 +298,29 @@ public class FloatingWindowController implements IFloatingWindowService {
     }
 
     private void onBound() {
-        showPendingViews();
-        lockPendingViews();
-        execPendingTasks();
+        synchronized (mLock) {
+            if (mIsDestroyed) {
+                return;
+            }
+            showPendingViews();
+            lockPendingViews();
+            execPendingTasks();
+        }
     }
 
     private void onResume() {
-        if (mService != null) {
-            mService.showAll();
+        synchronized (mLock) {
+            if (mService != null) {
+                mService.showAll();
+            }
         }
     }
 
     private void onPause() {
-        if (mService != null) {
-            mService.hideAll();
+        synchronized (mLock) {
+            if (mService != null) {
+                mService.hideAll();
+            }
         }
     }
 
