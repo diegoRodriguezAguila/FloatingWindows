@@ -83,6 +83,23 @@ public class FloatingWindowController implements IFloatingWindowService {
     }
 
     @Override
+    public void showAtLocation(FloatingWindowView floatingWindow, int gravity, int x, int y, int windowFlags) {
+        synchronized (mLock) {
+            if (mIsDestroyed)
+                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+                        "cannot call showAtLocation() method.");
+            floatingWindow.bindToService(this);
+            if (!mBound) {
+                mPendingViewLocations.put(floatingWindow.getId(), new WindowPosition(gravity, x,
+                        y, windowFlags));
+                mPendingViews.add(floatingWindow);
+                return;
+            }
+            mService.showAtLocation(floatingWindow, gravity, x, y, windowFlags);
+        }
+    }
+
+    @Override
     public void showAtLocation(FloatingWindowView floatingWindow, int gravity, int x, int y) {
         synchronized (mLock) {
             if (mIsDestroyed)
@@ -354,9 +371,13 @@ public class FloatingWindowController implements IFloatingWindowService {
         FloatingWindowView floatingWindow = mPendingViews.poll();
         while (floatingWindow != null) {
             WindowPosition pos = mPendingViewLocations.get(floatingWindow.getId());
-            if (pos != null)
-                mService.showAtLocation(floatingWindow, pos.gravity, pos.x, pos.y);
-            else mService.show(floatingWindow);
+            if (pos != null) {
+                if (pos.windowFlags == 0) {
+                    mService.showAtLocation(floatingWindow, pos.gravity, pos.x, pos.y);
+                } else {
+                    mService.showAtLocation(floatingWindow, pos.gravity, pos.x, pos.y, pos.windowFlags);
+                }
+            } else mService.show(floatingWindow);
             floatingWindow = mPendingViews.poll();
         }
         mPendingViewLocations.clear();
@@ -434,6 +455,7 @@ public class FloatingWindowController implements IFloatingWindowService {
         public int gravity;
         public int x;
         public int y;
+        public int windowFlags;
 
         public WindowPosition() {
         }
@@ -442,6 +464,14 @@ public class FloatingWindowController implements IFloatingWindowService {
             this.gravity = gravity;
             this.x = x;
             this.y = y;
+            this.windowFlags = 0;
+        }
+
+        public WindowPosition(int gravity, int x, int y, int windowFlags) {
+            this.gravity = gravity;
+            this.x = x;
+            this.y = y;
+            this.windowFlags = windowFlags;
         }
     }
 }

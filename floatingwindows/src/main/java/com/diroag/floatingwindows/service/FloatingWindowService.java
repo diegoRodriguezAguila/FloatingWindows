@@ -126,10 +126,24 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
     //region interface methods
 
     @Override
+    public void showAtLocation(FloatingWindowView view, int gravity, int x, int y, int windowFlags) {
+        if (view == null)
+            throw new IllegalArgumentException("view cannot be null");
+        if (x < 0 || y < 0)
+            throw new IllegalArgumentException("invalid x, y position");
+        FloatingWindowViewHolder viewHolder = findViewHolder(view);
+        if (viewHolder == null) {
+            viewHolder = new FloatingWindowViewHolder(view, gravity, x, y, windowFlags);
+            mFloatingWindows.add(viewHolder);
+        } else viewHolder.setPosition(gravity, x, y);
+        show(viewHolder);
+    }
+
+    @Override
     public void showAtLocation(FloatingWindowView view, int gravity, int x, int y) {
         if (view == null)
             throw new IllegalArgumentException("view cannot be null");
-        if(x<0 || y<0)
+        if (x < 0 || y < 0)
             throw new IllegalArgumentException("invalid x, y position");
         FloatingWindowViewHolder viewHolder = findViewHolder(view);
         if (viewHolder == null) {

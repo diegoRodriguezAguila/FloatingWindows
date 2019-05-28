@@ -27,12 +27,17 @@ class FloatingWindowViewHolder {
     }
 
     public FloatingWindowViewHolder(FloatingWindowView view, int gravity, int x, int y) {
+        this(view, gravity, x, y, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+    }
+
+    public FloatingWindowViewHolder(FloatingWindowView view, int gravity, int x, int y,
+                                    int windowFlags) {
         this.mWindowView = view;
         this.mRootView = view.createView();
         mParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? TYPE_APPLICATION_OVERLAY : TYPE_TOAST),
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                windowFlags,
                 PixelFormat.TRANSLUCENT);
         mParams.gravity = gravity;
         mParams.x = x;

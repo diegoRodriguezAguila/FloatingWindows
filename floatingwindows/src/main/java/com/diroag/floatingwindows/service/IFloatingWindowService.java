@@ -4,6 +4,16 @@ package com.diroag.floatingwindows.service;
  * Floating window service abstraction
  */
 interface IFloatingWindowService {
+    /**
+     * Shows the view as a floating window in the specified
+     * location by the specified gravity
+     * @param view view
+     * @param gravity {@link android.view.Gravity}
+     * @param x x position
+     * @param y y position
+     * @param windowFlags windowFlags
+     */
+    void showAtLocation(FloatingWindowView view, int gravity, int x, int y, int windowFlags);
 
     /**
      * Shows the view as a floating window in the specified

@@ -9,5 +9,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.diroag.floatingwindows.sample.MainActivity">
-
+<EditText
+    android:id="@+id/txtEdit"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"/>
 </RelativeLayout>
