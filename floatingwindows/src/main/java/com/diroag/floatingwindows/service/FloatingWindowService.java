@@ -62,13 +62,13 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
         if (view.isWindowShowed()) {
             return;
         }
+        windowManager.addView(viewHolder.getRootView(), viewHolder.getLayoutParams());
         viewHolder.setLayoutListener(new FloatingWindowViewHolder.LayoutListener() {
             @Override
             public void notifyLayoutUpdate(View rootView, WindowManager.LayoutParams params) {
                 windowManager.updateViewLayout(rootView, params);
             }
         });
-        windowManager.addView(viewHolder.getRootView(), viewHolder.getLayoutParams());
         view.setWindowShowed(true);
     }
 
@@ -135,7 +135,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
         if (viewHolder == null) {
             viewHolder = new FloatingWindowViewHolder(view, gravity, x, y, windowFlags);
             mFloatingWindows.add(viewHolder);
-        } else viewHolder.setPosition(gravity, x, y);
+        } else viewHolder.setPosition(gravity, x, y, windowFlags);
         show(viewHolder);
     }
 

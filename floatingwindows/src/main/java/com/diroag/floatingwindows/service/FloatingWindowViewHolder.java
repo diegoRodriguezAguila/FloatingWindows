@@ -136,6 +136,16 @@ class FloatingWindowViewHolder {
             mListener.notifyLayoutUpdate(mRootView, mParams);
     }
 
+    void setPosition(int gravity, int x, int y, int windowFlags) {
+        mParams.gravity = gravity;
+        mParams.x = x;
+        mParams.y = y;
+        mParams.flags = windowFlags;
+        reMeasureRootView();
+        if (mListener != null)
+            mListener.notifyLayoutUpdate(mRootView, mParams);
+    }
+
     /**
      * If its inner rootViews are equals they are equals
      *
