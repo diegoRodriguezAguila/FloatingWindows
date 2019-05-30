@@ -9,6 +9,7 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,7 @@ public class SampleView extends FloatingWindowView {
 
 
     private String mRequirementId;
+    public PopupWindow.OnDismissListener dismissListener;
 
 
     public SampleView(Context context, String requirementId) {
@@ -89,30 +91,38 @@ public class SampleView extends FloatingWindowView {
     }
 
     @OnClick(R.id.btn_cancel)
-    public void btnCancelClick(View v){
+    public void btnCancelClick(View v) {
         dismiss();
     }
 
     @OnClick(R.id.btn_proceed)
-    public void btnProceedClick(View v){
+    public void btnProceedClick(View v) {
         dismiss();
     }
 
     @OnClick(R.id.btn_close)
-    public void btnCloseClick(View v){
+    public void btnCloseClick(View v) {
         dismiss();
     }
 
     @OnClick(R.id.btn_lock)
-    public void btnLockClick(View v){
+    public void btnLockClick(View v) {
         if (isLocked()) {
             unlockPosition();
             btnLock.setImageResource(R.drawable.unlock);
-            Toast.makeText(getContext(),"Unlocked!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Unlocked!", Toast.LENGTH_SHORT).show();
             return;
         }
         lockPosition();
         btnLock.setImageResource(R.drawable.lock);
-        Toast.makeText(getContext(),"Locked!",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Locked!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        if (dismissListener != null) {
+            dismissListener.onDismiss();
+        }
     }
 }

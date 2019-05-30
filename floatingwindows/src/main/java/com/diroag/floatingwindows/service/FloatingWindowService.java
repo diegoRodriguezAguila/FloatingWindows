@@ -57,16 +57,19 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      *
      * @param viewHolder view holder
      */
-    private void show(FloatingWindowViewHolder viewHolder) {
+    private synchronized void show(FloatingWindowViewHolder viewHolder) {
         FloatingWindowView view = viewHolder.getWindowView();
-        if (view.isWindowShowed() || viewHolder.getRootView().getWindowToken() == null) {
+        if (view.isWindowShowed() || viewHolder.getRootView().getParent() != null) {
+            view.setWindowShowed(true);
             return;
         }
         windowManager.addView(viewHolder.getRootView(), viewHolder.getLayoutParams());
         viewHolder.setLayoutListener(new FloatingWindowViewHolder.LayoutListener() {
             @Override
             public void notifyLayoutUpdate(View rootView, WindowManager.LayoutParams params) {
-                windowManager.updateViewLayout(rootView, params);
+                if(rootView.getParent() != null) {
+                    windowManager.updateViewLayout(rootView, params);
+                }
             }
         });
         view.setWindowShowed(true);
@@ -77,7 +80,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      *
      * @param viewHolder view holder
      */
-    private boolean dismiss(FloatingWindowViewHolder viewHolder) {
+    private synchronized boolean dismiss(FloatingWindowViewHolder viewHolder) {
         return hide(viewHolder) && mFloatingWindows.remove(viewHolder);
     }
 
@@ -87,9 +90,11 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      * @param viewHolder view holder
      * @return true if it could be hide
      */
-    private boolean hide(FloatingWindowViewHolder viewHolder) {
+    private synchronized boolean hide(FloatingWindowViewHolder viewHolder) {
         FloatingWindowView view = viewHolder.getWindowView();
-        if (viewHolder.getRootView() == null || !view.isWindowShowed()) {
+        if (viewHolder.getRootView() == null || !view.isWindowShowed() ||
+                viewHolder.getRootView().getParent() == null) {
+            view.setWindowShowed(false);
             return false;
         }
         windowManager.removeView(viewHolder.getRootView());

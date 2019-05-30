@@ -85,9 +85,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void showAtLocation(FloatingWindowView floatingWindow, int gravity, int x, int y, int windowFlags) {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call showAtLocation() method.");
+                return;
+            }
             floatingWindow.bindToService(this);
             if (!mBound) {
                 mPendingViewLocations.put(floatingWindow.getId(), new WindowPosition(gravity, x,
@@ -102,9 +104,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void showAtLocation(FloatingWindowView floatingWindow, int gravity, int x, int y) {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call showAtLocation() method.");
+                return;
+            }
             floatingWindow.bindToService(this);
             if (!mBound) {
                 mPendingViewLocations.put(floatingWindow.getId(), new WindowPosition(gravity, x, y));
@@ -123,9 +127,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void show(FloatingWindowView floatingWindow) {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call show() method.");
+                return;
+            }
             floatingWindow.bindToService(this);
             if (!mBound) {
                 mPendingViews.add(floatingWindow);
@@ -138,9 +144,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void showAll() {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call showAll() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingTasks.add(new Runnable() {
                     @Override
@@ -162,9 +170,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void dismiss(FloatingWindowView floatingWindow) {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call dismiss() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingViews.remove(floatingWindow);
                 return;
@@ -176,9 +186,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void dismissAll() {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call dismissAll() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingTasks.add(new Runnable() {
                     @Override
@@ -195,9 +207,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void hideAll() {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call hideAll() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingTasks.add(new Runnable() {
                     @Override
@@ -219,9 +233,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void lockPosition(FloatingWindowView floatingWindow) {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call lockPosition() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingLocks.add(floatingWindow);
                 return;
@@ -233,9 +249,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void lockAll() {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call lockAll() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingTasks.add(new Runnable() {
                     @Override
@@ -257,9 +275,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void unlockPosition(FloatingWindowView floatingWindow) {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call unlockPosition() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingLocks.remove(floatingWindow);
                 return;
@@ -271,9 +291,11 @@ public class FloatingWindowController implements IFloatingWindowService {
     @Override
     public void unlockAll() {
         synchronized (mLock) {
-            if (mIsDestroyed)
-                throw new IllegalStateException("FloatingWindowController is already destroyed, " +
+            if (mIsDestroyed) {
+                errorServiceDestroyed("FloatingWindowController is already destroyed, " +
                         "cannot call unlockAll() method.");
+                return;
+            }
             if (!mBound) {
                 mPendingTasks.add(new Runnable() {
                     @Override
@@ -381,6 +403,10 @@ public class FloatingWindowController implements IFloatingWindowService {
             floatingWindow = mPendingViews.poll();
         }
         mPendingViewLocations.clear();
+    }
+
+    private void errorServiceDestroyed(String message) {
+        Log.e(TAG, message);
     }
 
     private void lockPendingViews() {
