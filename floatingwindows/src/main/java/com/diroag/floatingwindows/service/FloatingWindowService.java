@@ -59,7 +59,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      */
     private void show(FloatingWindowViewHolder viewHolder) {
         FloatingWindowView view = viewHolder.getWindowView();
-        if (view.isWindowShowed()) {
+        if (view.isWindowShowed() || viewHolder.getRootView().getWindowToken() == null) {
             return;
         }
         windowManager.addView(viewHolder.getRootView(), viewHolder.getLayoutParams());
