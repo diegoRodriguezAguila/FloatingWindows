@@ -1,9 +1,12 @@
 package com.diroag.floatingwindows.service;
 
 
+import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -63,11 +66,14 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
             view.setWindowShowed(true);
             return;
         }
+        if (!isSafeToShow(viewHolder)) {
+            return;
+        }
         windowManager.addView(viewHolder.getRootView(), viewHolder.getLayoutParams());
         viewHolder.setLayoutListener(new FloatingWindowViewHolder.LayoutListener() {
             @Override
             public void notifyLayoutUpdate(View rootView, WindowManager.LayoutParams params) {
-                if(rootView.getParent() != null) {
+                if (rootView.getParent() != null) {
                     windowManager.updateViewLayout(rootView, params);
                 }
             }
@@ -82,6 +88,31 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
      */
     private synchronized boolean dismiss(FloatingWindowViewHolder viewHolder) {
         return hide(viewHolder) && mFloatingWindows.remove(viewHolder);
+    }
+
+    private boolean isSafeToShow(FloatingWindowViewHolder viewHolder) {
+        final View rootView = viewHolder.getRootView();
+        if (rootView == null) {
+            return false;
+        }
+        final Context context = rootView.getContext();
+        if (context == null) {
+            return false;
+        }
+        if (context instanceof Activity) {
+            final Activity activity = (Activity) context;
+            View content = activity.findViewById(android.R.id.content);
+            if (content == null) {
+                return false;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                return content.getWindowToken() != null &&
+                        !activity.isFinishing() && !activity.isDestroyed();
+            }
+            return content.getWindowToken() != null && !activity.isFinishing();
+
+        }
+        return true;
     }
 
     /**
