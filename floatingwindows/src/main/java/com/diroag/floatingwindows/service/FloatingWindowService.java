@@ -128,7 +128,7 @@ public class FloatingWindowService extends Service implements IFloatingWindowSer
             view.setWindowShowed(false);
             return false;
         }
-        windowManager.removeView(viewHolder.getRootView());
+        windowManager.removeViewImmediate(viewHolder.getRootView());
         view.setWindowShowed(false);
         return true;
     }
