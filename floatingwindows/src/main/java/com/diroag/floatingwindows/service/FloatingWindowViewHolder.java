@@ -10,7 +10,7 @@ import android.view.WindowManager;
 import com.diroag.floatingwindows.view.BackListenerLayout;
 
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-import static android.view.WindowManager.LayoutParams.TYPE_TOAST;
+import static android.view.WindowManager.LayoutParams.TYPE_PHONE;
 
 /**
  * Created by drodriguez on 12/09/2016.
@@ -34,17 +34,26 @@ class FloatingWindowViewHolder {
                                     int windowFlags) {
         this.mWindowView = view;
         this.mRootView = view.createView();
+        int type = TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            type = TYPE_APPLICATION_OVERLAY;
+        }
         mParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? TYPE_APPLICATION_OVERLAY : TYPE_TOAST),
+                type,
                 windowFlags,
                 PixelFormat.TRANSLUCENT);
+
         mParams.gravity = gravity;
         mParams.x = x;
         mParams.y = y;
+
         setTouchListener();
+
         setBackListener();
+
         reMeasureRootView();
+
         setWindowLayoutListener();
     }
 
@@ -162,7 +171,7 @@ class FloatingWindowViewHolder {
         return mRootView.equals(other.mRootView);
     }
 
-    //region Inner interfaces
+//region Inner interfaces
 
     /**
      * Observable for window requests
@@ -171,5 +180,5 @@ class FloatingWindowViewHolder {
         void notifyLayoutUpdate(View rootView, WindowManager.LayoutParams params);
     }
 
-    //endregion
+//endregion
 }
